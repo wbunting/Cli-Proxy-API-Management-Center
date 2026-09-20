@@ -17,6 +17,7 @@ import { LiveWire } from './components/LiveWire';
 import { Meter } from './components/Meter';
 import { Sparkline } from './components/Sparkline';
 import { ThroughputChart } from './components/ThroughputChart';
+import { TokenEconomicsPanel } from './components/TokenEconomicsPanel';
 import { useCountUp, useRevealGroup, useRevealOnScroll } from '@/hooks/motion';
 import { providerLabel, splitWindowMinutes, toneForSuccessRate, type MeterTone } from './utils';
 import styles from './dashboard.module.scss';
@@ -40,8 +41,19 @@ export function DashboardPage() {
   const serverVersion = useAuthStore((state) => state.serverVersion);
   const serverBuildDate = useAuthStore((state) => state.serverBuildDate);
 
-  const { connectionStatus, connected, config, counts, traffic, providers, credentials, refresh } =
-    useDashboardOverview();
+  const {
+    connectionStatus,
+    connected,
+    config,
+    counts,
+    traffic,
+    providers,
+    credentials,
+    tokenEconomics,
+    tokenEconomicsLoading,
+    tokenEconomicsError,
+    refresh,
+  } = useDashboardOverview();
 
   useHeaderRefresh(refresh, connected);
 
@@ -49,6 +61,7 @@ export function DashboardPage() {
   const heroRef = useRevealGroup<HTMLElement>();
   const statsRef = useRevealGroup<HTMLElement>(0.12);
   const trafficRef = useRevealOnScroll<HTMLElement>();
+  const economicsRef = useRevealOnScroll<HTMLElement>();
   const fleetRef = useRevealOnScroll<HTMLElement>();
   const detailRef = useRevealGroup<HTMLElement>();
   const ctaRef = useRevealGroup<HTMLElement>();
@@ -349,6 +362,25 @@ export function DashboardPage() {
         </header>
         <div className={styles.panel}>
           <ThroughputChart traffic={traffic} />
+        </div>
+      </section>
+
+      {/* ---------- Token economics ---------- */}
+      <section className={styles.section} ref={economicsRef}>
+        <header className={styles.sectionHead}>
+          <span className={styles.eyebrow}>▍ Token economics</span>
+          <h2 className={styles.sectionTitle}>Tokens and API-equivalent cost</h2>
+          <p className={styles.sectionDescription}>
+            Successful calls retained by the router, split by model. Cost uses public base API
+            sticker rates for comparison—not what your subscriptions bill.
+          </p>
+        </header>
+        <div className={styles.panel}>
+          <TokenEconomicsPanel
+            economics={tokenEconomics}
+            loading={tokenEconomicsLoading}
+            error={tokenEconomicsError}
+          />
         </div>
       </section>
 
