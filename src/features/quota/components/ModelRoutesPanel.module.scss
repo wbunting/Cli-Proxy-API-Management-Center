@@ -1,0 +1,217 @@
+@use '../../../styles/mixins' as *;
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--bg-primary) 88%, transparent);
+}
+
+.headingRow,
+.cardHead,
+.routeSummary,
+.member {
+  display: flex;
+  align-items: center;
+}
+
+.headingRow,
+.cardHead {
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.eyebrow,
+.kind,
+.count,
+.remaining span,
+.routeSummary span,
+.member small,
+.memberQuota,
+.usage {
+  font-family: $font-mono;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.eyebrow {
+  margin: 0 0 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.title,
+.card h3 {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.title {
+  font-size: 18px;
+}
+
+.description,
+.empty,
+.error {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+
+.error {
+  color: var(--danger-color);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
+  gap: 14px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg-tertiary) 38%, transparent);
+}
+
+.kind {
+  display: inline-flex;
+  margin-bottom: 5px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent-color) 14%, transparent);
+  color: var(--accent-color);
+  text-transform: uppercase;
+}
+
+.card h3 {
+  font-size: 14px;
+}
+
+.card code {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.remaining {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+
+.remaining strong {
+  font-family: $font-mono;
+  font-size: 20px;
+  color: var(--text-primary);
+}
+
+.routeSummary {
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bg-primary) 72%, transparent);
+}
+
+.routeSummary > div {
+  min-width: 0;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.routeSummary strong {
+  overflow: hidden;
+  font-family: $font-mono;
+  font-size: 12px;
+  color: var(--text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.routeSummary small {
+  color: var(--text-tertiary);
+}
+
+.arrow {
+  color: var(--accent-color) !important;
+}
+
+.members {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.member {
+  display: grid;
+  grid-template-columns: 22px minmax(120px, 1fr) auto auto;
+  gap: 8px;
+  padding: 8px;
+  border-top: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
+}
+
+.rank {
+  font-family: $font-mono;
+  color: var(--text-tertiary);
+}
+
+.memberName {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.memberName strong {
+  overflow: hidden;
+  font-family: $font-mono;
+  font-size: 11.5px;
+  color: var(--text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.available,
+.cooling {
+  font-family: $font-mono;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.available {
+  color: var(--success-color);
+}
+
+.cooling {
+  color: var(--warning-color);
+}
+
+.memberQuota,
+.usage {
+  text-align: right;
+}
+
+.usage {
+  grid-column: 2 / -1;
+}
+
+@include mobile {
+  .panel {
+    padding: 14px;
+  }
+
+  .member {
+    grid-template-columns: 20px minmax(100px, 1fr) auto;
+  }
+
+  .memberQuota {
+    grid-column: 2 / -1;
+  }
+}
