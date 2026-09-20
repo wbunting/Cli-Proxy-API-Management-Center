@@ -10,7 +10,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { authFilesApi } from '@/services/api';
+import { authFilesApi, modelRoutesApi, type ModelRoute } from '@/services/api';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Select } from '@/components/ui/Select';
@@ -25,6 +25,7 @@ import { ProviderTabs } from '@/features/authFiles/components/ProviderTabs';
 import { QuotaHeader } from './components/QuotaHeader';
 import { QuotaCard } from './components/QuotaCard';
 import { QuotaTimeline } from './components/QuotaTimeline';
+import { ModelRoutesPanel } from './components/ModelRoutesPanel';
 import {
   CARD_ENTRANCE_BUDGET_MS,
   QUOTA_PAGE_SIZE,
@@ -68,6 +69,9 @@ export function QuotaPage() {
   const [files, setFiles] = useState<AuthFileItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [routes, setRoutes] = useState<ModelRoute[]>([]);
+  const [routesLoading, setRoutesLoading] = useState(true);
+  const [routesError, setRoutesError] = useState('');
   const [tab, setTab] = useState<QuotaTabId>(() => readQuotaUiState()?.tab ?? 'all');
   const [sortMode, setSortMode] = useState<QuotaSortMode>(
     () => readQuotaUiState()?.sortMode ?? 'default'
@@ -110,14 +114,36 @@ export function QuotaPage() {
     }
   }, [connectionStatus, sessionGeneration, t]);
 
-  useHeaderRefresh(loadFiles);
+  const loadRoutes = useCallback(async () => {
+    if (connectionStatus !== 'connected') {
+      setRoutes([]);
+      setRoutesLoading(false);
+      return;
+    }
+    setRoutesLoading(true);
+    setRoutesError('');
+    try {
+      const response = await modelRoutesApi.list();
+      setRoutes(response.routes ?? []);
+    } catch (err: unknown) {
+      setRoutesError(err instanceof Error ? err.message : t('notification.refresh_failed'));
+    } finally {
+      setRoutesLoading(false);
+    }
+  }, [connectionStatus, t]);
+
+  const refreshPage = useCallback(async () => {
+    await Promise.all([loadFiles(), loadRoutes()]);
+  }, [loadFiles, loadRoutes]);
+
+  useHeaderRefresh(refreshPage);
 
   useEffect(() => {
-    void loadFiles();
+    void refreshPage();
     return () => {
       listRequestRef.current += 1;
     };
-  }, [loadFiles]);
+  }, [refreshPage]);
 
   /* ---------- 额度缓存 ----------
    * 排在归类/排序之前：「最快恢复优先」要读它算排序键。 */
@@ -238,8 +264,8 @@ export function QuotaPage() {
   const handleRefreshAll = useCallback(() => {
     if (disableControls) return;
     pendingRefreshRef.current = sessionGeneration;
-    void loadFiles();
-  }, [disableControls, loadFiles, sessionGeneration]);
+    void Promise.all([loadFiles(), loadRoutes()]);
+  }, [disableControls, loadFiles, loadRoutes, sessionGeneration]);
 
   useEffect(() => {
     const wasLoading = prevLoadingRef.current;
@@ -307,10 +333,12 @@ export function QuotaPage() {
         totalCount={entries.length}
         loadedCount={loadedCount}
         attentionCount={attentionCount}
-        refreshing={loading || batchLoading}
+        refreshing={loading || batchLoading || routesLoading}
         disableControls={disableControls}
         onRefreshAll={handleRefreshAll}
       />
+
+      <ModelRoutesPanel routes={routes} loading={routesLoading} error={routesError} />
 
       <section className={styles.workbench}>
         {/* tabs + 排序作为一个整体入场（useRevealGroup 会给每个 [data-reveal]

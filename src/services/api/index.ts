@@ -11,6 +11,7 @@ export * from './oauth';
 export * from './logs';
 export * from './version';
 export * from './models';
+export * from './modelRoutes';
 export * from './metaQuota';
 export * from './plugins';
 export * from './transformers';
