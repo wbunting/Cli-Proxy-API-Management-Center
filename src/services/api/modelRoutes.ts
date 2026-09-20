@@ -7,6 +7,7 @@ export type ModelRouteMember = {
   available: boolean;
   quota_remaining?: number;
   quota_known: boolean;
+  quota_capacity?: number;
   reset_at?: string;
   last_used_at?: string;
   requests: number;

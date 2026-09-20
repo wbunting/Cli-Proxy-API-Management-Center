@@ -57,6 +57,9 @@ function RouteCards({ routes }: { routes: ModelRoute[] }) {
                 </span>
                 <span className={styles.memberQuota}>
                   {member.quota_known ? pct(member.quota_remaining) : 'quota —'}
+                  {member.quota_known && (member.quota_capacity ?? 0) > 1
+                    ? ` · ${member.quota_capacity}× cap`
+                    : ''}
                 </span>
                 <span className={styles.usage}>
                   {compact(member.requests)} req ·{' '}
@@ -89,8 +92,9 @@ export function ModelRoutesPanel({ routes, loading, error }: Props) {
         <span className={styles.count}>{routes.length} routes</span>
       </div>
       <p className={styles.description}>
-        Tier capacity sits below the provider quota cards. Role routes follow with the current
-        model, best-effort aggregate remaining quota, next fallback, and retained usage.
+        Tier capacity sits below the provider quota cards. Remaining quota is capacity-weighted
+        across known plans—for example, Max 20× contributes four times as much as Max 5×. Role
+        routes follow with the current model, next fallback, and retained usage.
       </p>
       {error ? <div className={styles.error}>{error}</div> : null}
       {routes.length === 0 ? (
