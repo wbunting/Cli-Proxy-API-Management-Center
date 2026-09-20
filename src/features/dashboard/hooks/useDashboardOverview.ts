@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { authFilesApi } from '@/services/api';
+import { authFilesApi, usageSnapshotApi } from '@/services/api';
 import { useAuthStore, useConfigStore, useModelsStore } from '@/stores';
 import { useApiKeysForModels } from '@/hooks/useApiKeysForModels';
 import { useProviderRecentRequests } from '@/components/providers/hooks/useProviderRecentRequests';
@@ -17,6 +17,7 @@ import {
   type ProviderTraffic,
   type TrafficWindow,
 } from '../types';
+import { buildTokenEconomics, type TokenEconomics } from '../tokenEconomics';
 
 const EMPTY_TRAFFIC: TrafficWindow = {
   buckets: [],
@@ -128,6 +129,9 @@ export function useDashboardOverview() {
   });
 
   const [authFiles, setAuthFiles] = useState<AuthFileItem[] | null>(null);
+  const [tokenEconomics, setTokenEconomics] = useState<TokenEconomics | null>(null);
+  const [tokenEconomicsLoading, setTokenEconomicsLoading] = useState(false);
+  const [tokenEconomicsError, setTokenEconomicsError] = useState('');
 
   const loadAuthFiles = useCallback(async () => {
     if (!connected) return;
@@ -149,12 +153,26 @@ export function useDashboardOverview() {
     }
   }, [connected, apiBase, resolveApiKeysForModels, fetchModelsFromStore]);
 
+  const loadTokenEconomics = useCallback(async () => {
+    if (!connected) return;
+    setTokenEconomicsLoading(true);
+    setTokenEconomicsError('');
+    try {
+      setTokenEconomics(buildTokenEconomics(await usageSnapshotApi.list()));
+    } catch (error) {
+      setTokenEconomicsError(error instanceof Error ? error.message : 'Failed to load token usage');
+    } finally {
+      setTokenEconomicsLoading(false);
+    }
+  }, [connected]);
+
   useEffect(() => {
     if (!connected) return;
     void fetchConfig().catch(() => undefined);
     void loadAuthFiles();
     void loadModels();
-  }, [connected, fetchConfig, loadAuthFiles, loadModels]);
+    void loadTokenEconomics();
+  }, [connected, fetchConfig, loadAuthFiles, loadModels, loadTokenEconomics]);
 
   const refresh = useCallback(async () => {
     if (!connected) return;
@@ -163,8 +181,16 @@ export function useDashboardOverview() {
       loadAuthFiles(),
       loadModels(),
       refreshRecentRequests(),
+      loadTokenEconomics(),
     ]);
-  }, [connected, fetchConfig, loadAuthFiles, loadModels, refreshRecentRequests]);
+  }, [
+    connected,
+    fetchConfig,
+    loadAuthFiles,
+    loadModels,
+    refreshRecentRequests,
+    loadTokenEconomics,
+  ]);
 
   const providerKeyCounts = useMemo(() => (config ? getProviderKeyCounts(config) : null), [config]);
 
@@ -291,6 +317,9 @@ export function useDashboardOverview() {
     traffic,
     providers,
     credentials,
+    tokenEconomics,
+    tokenEconomicsLoading,
+    tokenEconomicsError,
     refresh,
   };
 }

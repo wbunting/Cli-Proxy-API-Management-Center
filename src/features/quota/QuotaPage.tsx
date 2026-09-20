@@ -338,8 +338,6 @@ export function QuotaPage() {
         onRefreshAll={handleRefreshAll}
       />
 
-      <ModelRoutesPanel routes={routes} loading={routesLoading} error={routesError} />
-
       <section className={styles.workbench}>
         {/* tabs + 排序作为一个整体入场（useRevealGroup 会给每个 [data-reveal]
             后代加一级级差，所以排序控件放在同一个节点里而不是做兄弟） */}
@@ -448,6 +446,8 @@ export function QuotaPage() {
           resolvedTheme={resolvedTheme}
         />
       </section>
+
+      <ModelRoutesPanel routes={routes} loading={routesLoading} error={routesError} />
     </div>
   );
 }

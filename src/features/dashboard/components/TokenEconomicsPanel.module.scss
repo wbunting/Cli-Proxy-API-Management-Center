@@ -1,0 +1,166 @@
+@use '../../../styles/mixins' as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.loading,
+.error,
+.note {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.error {
+  color: var(--danger-color);
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--border-color);
+}
+
+.summary > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px;
+  background: var(--bg-primary);
+}
+
+.summary span,
+.summary small,
+.legend,
+.row > span,
+.row > b {
+  font-family: $font-mono;
+}
+
+.summary span,
+.summary small {
+  color: var(--text-tertiary);
+  font-size: 10px;
+}
+
+.summary strong {
+  color: var(--text-primary);
+  font-family: $font-mono;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.legend {
+  display: flex;
+  gap: 16px;
+  color: var(--text-tertiary);
+  font-size: 10px;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.inputKey,
+.inputBar {
+  background: var(--viz-success);
+}
+
+.outputKey,
+.outputBar {
+  background: var(--accent-color);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(150px, 1.1fr) minmax(120px, 1fr) auto auto auto auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  border-top: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+}
+
+.model {
+  overflow: hidden;
+  color: var(--text-primary) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track {
+  display: flex;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--bg-tertiary);
+}
+
+.inputBar,
+.outputBar {
+  min-width: 1px;
+}
+
+.row > span,
+.row > b {
+  color: var(--text-tertiary);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.row > b {
+  color: var(--text-primary);
+  text-align: right;
+}
+
+.note {
+  margin: 0;
+  line-height: 1.6;
+}
+
+@media (max-width: 840px) {
+  .summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .row {
+    grid-template-columns: minmax(130px, 1fr) minmax(90px, 1fr) auto;
+    padding-block: 8px;
+  }
+
+  .row > span:nth-of-type(n + 3) {
+    display: none;
+  }
+}
+
+@include mobile {
+  .summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
